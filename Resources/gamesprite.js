@@ -39,7 +39,7 @@ GameSprite.prototype.moveStraight = function(x,y,speed) {
  * @param int y1
  */
 GameSprite.prototype.calculateDistance = function(x0,y0,x1,y1) {
-	return Math.sqrt((x0-x1)^2 + (y0-y1^2));
+	return Math.sqrt((x0-x1)^2 + (y0-y1)^2);
 }
 
 module.exports = GameSprite;
