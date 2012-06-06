@@ -47,14 +47,6 @@
     	<tool-api-level>8</tool-api-level>
 	   <manifest android:installLocation="preferExternal">
 	      <uses-sdk android:minSdkVersion="7" />
-	      <activity
-		    android:name="org.appcelerator.titanium.TiActivity"
-		    android:configChanges="keyboardHidden"
-		       android:screenOrientation="landscape"
-		    />
-		    <activity android:name="ti.modules.titanium.ui.TiTabActivity"
-		      android:configChanges="keyboardHidden"
-		    />
 	   </manifest>
     </android>
     <mobileweb>

@@ -7,15 +7,17 @@ fariazz.GameSprite = require('/gamesprite');
 
 // Create view for your game.
 // Note that game.screen.width and height are not yet set until the game is loaded
-var game = quicktigame2d.createGameView();
+var gameView = quicktigame2d.createGameView();
+
+gameView.orientation = Ti.UI.PORTRAIT;
 
 // Frame rate can be changed (fps can not be changed after the game is loaded)
-game.fps = 30;
+gameView.fps = 30;
 
 // set initial background color to black
-game.color(0, 0, 0);
+gameView.color(0, 0, 0);
 
-game.debug = true;
+gameView.debug = true;
 
 // Create game scene
 var scene = quicktigame2d.createScene();
@@ -57,24 +59,31 @@ scene.add(map);
 scene.add(player.sprite);
 
 // add your scene to game view
-game.pushScene(scene);
+gameView.pushScene(scene);
+
+gameView.WINDOW_SCALE_FACTOR_X = 1;
+gameView.WINDOW_SCALE_FACTOR_Y = 1;
 
 // Onload event is called when the game is loaded.
 // The game.screen.width and game.screen.height are not yet set until this onload event.
-game.addEventListener('onload', function(e) {
+gameView.addEventListener('onload', function(e) {
 	
 	// set screen size for your game (non-retina size)
-	var screenScale = game.size.width / 320;
-	game.screen = {width:game.size.width / screenScale, height:game.size.height / screenScale};
+	var screenScale = gameView.size.width / 320;
+	gameView.screen = {width:gameView.size.width / screenScale, height:gameView.size.height / screenScale};
+	
+	gameView.WINDOW_SCALE_FACTOR_X = gameView.screen.width  / gameView.size.width;
+    gameView.WINDOW_SCALE_FACTOR_Y = gameView.screen.height / gameView.size.height;
 	
     // Start the game
-    game.start();
+    gameView.start();
 });
 
-game.addEventListener('touchstart', function(e) {
-	Ti.API.info(e.x);
-	Ti.API.info(e.y);
-	player.moveStraight(e.x,e.y,0.01);
+gameView.addEventListener('touchstart', function(e) {
+	//Ti.API.info('x0: '+e.x*gameView.WINDOW_SCALE_FACTOR_X);
+	//Ti.API.info('y0: '+e.y*gameView.WINDOW_SCALE_FACTOR_Y);
+	speed = 0.1;
+	player.moveStraight(e.x*gameView.WINDOW_SCALE_FACTOR_X,e.y*gameView.WINDOW_SCALE_FACTOR_Y,speed,true);
 	
 });
 
@@ -83,5 +92,5 @@ game.addEventListener('touchstart', function(e) {
 Ti.include("debug.js");
 
 // Add your game view
-window.add(game);
+window.add(gameView);
 window.open({fullscreen:true, navBarHidden:true});

@@ -1,1 +1,4 @@
+The code is released under the following license:
 http://www.opensource.org/licenses/bsd-license.php
+
+The tiles used are created by Sharm (http://opengameart.org/content/16x16-overworld-tiles) and released under CC-BY 3.0
