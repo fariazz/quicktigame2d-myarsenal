@@ -72,7 +72,6 @@ game.addEventListener('onload', function(e) {
 });
 
 game.addEventListener('touchstart', function(e) {
-	e.preventDefault();
 	Ti.API.info(e.x);
 	Ti.API.info(e.y);
 	player.moveStraight(e.x,e.y,0.01);
