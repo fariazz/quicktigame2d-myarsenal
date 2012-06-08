@@ -5,7 +5,7 @@ Logfile initialized
 [DEBUG] Waiting for device to be ready ...
 [TRACE] adb devices returned 1 devices/emulators
 [DEBUG] Device connected... (waited 0 seconds)
-[DEBUG] waited 0.006958 seconds on emulator to get ready
+[DEBUG] waited 0.006252 seconds on emulator to get ready
 [DEBUG] com.example.helloworld installed? False
 [INFO] Copying CommonJS modules...
 [INFO] Copying project resources..
@@ -44,6 +44,8 @@ Logfile initialized
 [DEBUG] Android classes.dex built
 [DEBUG] creating unsigned apk: /home/fariazz/Titanium Studio Workspace/helloworld/build/android/bin/app-unsigned.apk
 [DEBUG] from resource zip => assets/Resources/graphics/map.json
+[DEBUG] from resource zip => assets/Resources/graphics/map2.json
+[DEBUG] from resource zip => assets/Resources/graphics/map3.json
 [DEBUG] from resource zip => assets/Resources/graphics/player.png
 [DEBUG] from resource zip => assets/Resources/graphics/set_0.png
 [DEBUG] from resource zip => assets/Resources/KS_nav_ui.png
@@ -51,6 +53,7 @@ Logfile initialized
 [DEBUG] from resource zip => assets/Resources/app.js
 [DEBUG] from resource zip => assets/Resources/appicon.png
 [DEBUG] from resource zip => assets/Resources/default.png
+[DEBUG] from resource zip => assets/Resources/gamemap.js
 [DEBUG] from resource zip => assets/Resources/gamesprite.js
 [DEBUG] from resource zip => assets/Resources/ti.cloud.js
 [DEBUG] from resource zip => assets/app.json
@@ -96,6 +99,5 @@ Logfile initialized
 [DEBUG] Waiting for device to be ready ...
 [TRACE] adb devices returned 1 devices/emulators
 [DEBUG] Device connected... (waited 0 seconds)
-[DEBUG] waited 0.007591 seconds on emulator to get ready
+[DEBUG] waited 0.006771 seconds on emulator to get ready
 [INFO] Installing application on device
-[INFO] Application installed. Launch from drawer on Home Screen

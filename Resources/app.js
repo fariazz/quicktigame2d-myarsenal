@@ -4,6 +4,7 @@ var window = Ti.UI.createWindow({backgroundColor:'black'});
 var quicktigame2d = require('com.googlecode.quicktigame2d');
 var fariazz = {};
 fariazz.GameSprite = require('/gamesprite');
+fariazz.GameMap = require('/gamemap');
 
 // Create view for your game.
 // Note that game.screen.width and height are not yet set until the game is loaded
@@ -25,7 +26,7 @@ var scene = quicktigame2d.createScene();
 
 //load map files
 var GRAPHICS_DIR = 'graphics/';
-var mapfile = Ti.Filesystem.getFile(Titanium.Filesystem.resourcesDirectory, GRAPHICS_DIR + 'map.json');
+var mapfile = Ti.Filesystem.getFile(Titanium.Filesystem.resourcesDirectory, GRAPHICS_DIR + 'map3.json');
 var mapjson = JSON.parse(mapfile.read().toString());
 
 var mapinfo = {
@@ -37,25 +38,34 @@ var mapinfo = {
 };
 
 // create map layer
-var map = quicktigame2d.createMapSprite(mapinfo);
+var map = new fariazz.GameMap();
+map.tilemap = quicktigame2d.createMapSprite(mapinfo);
+map.tilemap.width  = map.tilemap.tileWidth  * mapjson.layers[0].width;
+map.tilemap.height = map.tilemap.tileHeight * mapjson.layers[0].height;
+map.tilemap.firstgid = mapjson.tilesets[0].firstgid; // tilemap id is started from 'firstgid'
+map.tilemap.tiles = mapjson.layers[0].data;
 
-map.width  = map.tileWidth  * mapjson.layers[0].width;
-map.height = map.tileHeight * mapjson.layers[0].height;
+map.blockedmap = quicktigame2d.createMapSprite(mapinfo);
+map.blockedmap.width  = map.blockedmap.tileWidth  * mapjson.layers[0].width;
+map.blockedmap.height = map.blockedmap.tileHeight * mapjson.layers[0].height;
+map.blockedmap.firstgid = mapjson.tilesets[0].firstgid; // tilemap id is started from 'firstgid'
+map.blockedmap.tiles = mapjson.layers[1].data;
 
-map.firstgid = mapjson.tilesets[0].firstgid; // tilemap id is started from 'firstgid'
-map.tiles = mapjson.layers[0].data;
+map.blocked_id = 113;
+map.updateBlockingElements();
 
 //create player
 var player = new fariazz.GameSprite();
+player.gameMap = map;
 player.sprite = quicktigame2d.createSprite({image:GRAPHICS_DIR+'player.png'});
 player.sprite.x = 100;
 player.sprite.y = 100;
 
 
 // set z-order
-map.z  = 0;
+map.tilemap.z  = 0;
 
-scene.add(map);
+scene.add(map.tilemap);
 scene.add(player.sprite);
 
 // add your scene to game view
@@ -77,13 +87,27 @@ gameView.addEventListener('onload', function(e) {
 	
     // Start the game
     gameView.start();
+    
 });
 
 gameView.addEventListener('touchstart', function(e) {
 	//Ti.API.info('x0: '+e.x*gameView.WINDOW_SCALE_FACTOR_X);
 	//Ti.API.info('y0: '+e.y*gameView.WINDOW_SCALE_FACTOR_Y);
-	speed = 0.1;
-	player.moveStraight(e.x*gameView.WINDOW_SCALE_FACTOR_X,e.y*gameView.WINDOW_SCALE_FACTOR_Y,speed,true);
+	var speed = 0.1;
+	
+	//get cell that was click and move to the top left corner
+	var cell = map.getCellFromXY(e.x*gameView.WINDOW_SCALE_FACTOR_X,e.y*gameView.WINDOW_SCALE_FACTOR_Y );
+	var coord = map.getXYFromCell(cell.col, cell.row);
+	
+	player.moveStraightCheck(coord.x,coord.y,speed);
+	
+	
+	var index = map.getIndexFromCell(cell.col,cell.row);
+	Ti.API.info(index);
+	
+	var tile = map.tilemap.getTile(index);
+	Ti.API.info(JSON.stringify(tile));
+
 	
 });
 

@@ -31,7 +31,7 @@
  "tilesets":[
         {
          "firstgid":1,
-         "image":"set_0.gif",
+         "image":"set_0.png",
          "imageheight":288,
          "imagewidth":288,
          "margin":0,
@@ -41,7 +41,14 @@
 
             },
          "spacing":0,
-         "tileheight":16,         
+         "tileheight":16,
+         "tileproperties":
+            {
+             "113":
+                {
+                 "blocked":1
+                }        
+            },
          "tilewidth":16
         }],
  "tilewidth":16,
