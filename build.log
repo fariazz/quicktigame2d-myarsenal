@@ -5,10 +5,11 @@ Logfile initialized
 [DEBUG] Waiting for device to be ready ...
 [TRACE] adb devices returned 1 devices/emulators
 [DEBUG] Device connected... (waited 0 seconds)
-[DEBUG] waited 0.006252 seconds on emulator to get ready
+[DEBUG] waited 0.006573 seconds on emulator to get ready
 [DEBUG] com.example.helloworld installed? False
 [INFO] Copying CommonJS modules...
 [INFO] Copying project resources..
+[TRACE] COPYING MODIFIED FILE: /home/fariazz/Titanium Studio Workspace/helloworld/Resources/gamesprite.js => /home/fariazz/Titanium Studio Workspace/helloworld/build/android/bin/assets/Resources/gamesprite.js
 [TRACE] Generating Java Classes
 [DEBUG] Processing Android resource drawables
 [DEBUG] copying app icon: /home/fariazz/Titanium Studio Workspace/helloworld/build/android/bin/assets/Resources/appicon.png
@@ -99,5 +100,6 @@ Logfile initialized
 [DEBUG] Waiting for device to be ready ...
 [TRACE] adb devices returned 1 devices/emulators
 [DEBUG] Device connected... (waited 0 seconds)
-[DEBUG] waited 0.006771 seconds on emulator to get ready
+[DEBUG] waited 0.007731 seconds on emulator to get ready
 [INFO] Installing application on device
+[INFO] Application installed. Launch from drawer on Home Screen

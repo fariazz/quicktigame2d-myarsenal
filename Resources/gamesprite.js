@@ -87,14 +87,14 @@ GameSprite.prototype.moveStraightCheck = function(x,y,speed) {
 	//direction
 	var dx = x - this.sprite.x;
 	var dy = y - this.sprite.y;
-	var delta = this.sprite.width;
+	var delta = this.gameMap.tilemap.tileWidth/4;
 	var sin_alfa = dy / (Math.sqrt(Math.pow(dx,2) + Math.pow(dy,2)));
 	var cos_alfa = dx / (Math.sqrt(Math.pow(dx,2) + Math.pow(dy,2)));
 	
 	var delta_y = delta*sin_alfa;
 	var delta_x = delta*cos_alfa;
 	
-	var step = this.gameMap.tilemap.tileWidth;
+	var step = this.gameMap.tilemap.tileWidth/4;
 	var was_blocked = false;
 	var distance =  this.calculateDistance(this.sprite.x,x,this.sprite.y,y);
 	for(i=0;i<distance;i=i+delta) {
@@ -102,8 +102,8 @@ GameSprite.prototype.moveStraightCheck = function(x,y,speed) {
 		current_x = this.sprite.x + cos_alfa * i;
 		current_y = this.sprite.y + sin_alfa * i;
 		
-		current_x_check = dx > 0 ? current_x+this.sprite.width-1+delta_x : current_x;
-		current_y_check = dy > 0 ? current_y+this.sprite.height-1+delta_y : current_y;
+		current_x_check = dx > 0 ? current_x+this.sprite.width-1+delta_x : current_x - delta_x;
+		current_y_check = dy > 0 ? current_y+this.sprite.height-1+delta_y : current_y - delta_y;
 		
 		//check x
 		for(j=0;j<this.sprite.height;j = j+step) {
@@ -113,6 +113,10 @@ GameSprite.prototype.moveStraightCheck = function(x,y,speed) {
 			}
 		}
 		
+		if(was_blocked)
+			break;
+		
+		
 		//check y
 		for(j=0;j<this.sprite.width;j = j+step) {
 			if(this.gameMap.isBlocked(current_x+j, current_y_check)) {
@@ -120,6 +124,9 @@ GameSprite.prototype.moveStraightCheck = function(x,y,speed) {
 				break;			
 			}
 		}
+		
+		if(was_blocked)
+			break;
 		
 		//check diagonal
 		if(this.gameMap.isBlocked(current_x_check, current_y_check)) {
