@@ -9,6 +9,7 @@ var quicktigame2d = require('com.googlecode.quicktigame2d');
 GameSprite = function() {
 	this.sprite = {};
 	this.gameMap = {};
+	this.isMoving = false;
 }
 
 /*
@@ -49,11 +50,13 @@ GameSprite.prototype.moveStraight = function(x,y,speed,centered) {
 	
 	Ti.API.info('duration: '+transform.duration);
 	
-	transform.move(x,y);	
+	transform.move(x,y);
+	this.isMoving = true;	
 	this.sprite.transform(transform);
 	
-	sprite = this.sprite;
+	sprite = this;
 	transform.addEventListener('complete', function(e) {
+		sprite.isMoving = false;
 	  //Ti.API.info(sprite.x);
 	  //Ti.API.info(sprite.y);
 	});
@@ -85,63 +88,66 @@ GameSprite.prototype.calculateDistance = function(x0,x1,y0,y1) {
  */
 GameSprite.prototype.moveStraightCheck = function(x,y,speed) {
 	//direction
+	var final_cell = this.gameMap.getCellXYFromXY(x,y);
+	var distance =  this.calculateDistance(this.sprite.x,final_cell.x,this.sprite.y,final_cell.y);
+	var delta = Math.min(distance,this.gameMap.tilemap.tileWidth/4);
+	
+	//Ti.API.info('delta:'+delta);
+	
 	var dx = x - this.sprite.x;
 	var dy = y - this.sprite.y;
-	var delta = this.gameMap.tilemap.tileWidth/4;
-	var sin_alfa = dy / (Math.sqrt(Math.pow(dx,2) + Math.pow(dy,2)));
-	var cos_alfa = dx / (Math.sqrt(Math.pow(dx,2) + Math.pow(dy,2)));
+	var sin_alfa = dy / distance;
+	var cos_alfa = dx / distance;
 	
 	var delta_y = delta*sin_alfa;
 	var delta_x = delta*cos_alfa;
 	
-	var step = this.gameMap.tilemap.tileWidth/4;
 	var was_blocked = false;
-	var distance =  this.calculateDistance(this.sprite.x,x,this.sprite.y,y);
+	
+	this.isMoving = true;
 	for(i=0;i<distance;i=i+delta) {
 		
-		current_x = this.sprite.x + cos_alfa * i;
-		current_y = this.sprite.y + sin_alfa * i;
+		var current_y = (this.sprite.y+this.gameMap.tilemap.tileHeight/2) + sin_alfa * i;
+		var current_x = (this.sprite.x+this.gameMap.tilemap.tileWidth/2) + cos_alfa * i;
 		
-		current_x_check = dx > 0 ? current_x+this.sprite.width-1+delta_x : current_x - delta_x;
-		current_y_check = dy > 0 ? current_y+this.sprite.height-1+delta_y : current_y - delta_y;
+		//Ti.API.info('current x:'+(current_x)+'current y:'+(current_y));
+		//Ti.API.info('current index:'+this.gameMap.getIndexFromXY(current_x,current_y));
+				
+		//Ti.API.info('target raw x:'+(current_x+delta_x)+'target raw y:'+(current_y+delta_y));
+		//Ti.API.info('target raw index:'+this.gameMap.getIndexFromXY((current_x+delta_x),(current_y+delta_y)));
 		
-		//check x
-		for(j=0;j<this.sprite.height;j = j+step) {
-			if(this.gameMap.isBlocked(current_x_check, current_y+j)) {
-				was_blocked = true;
-				break;						
-			}
-		}
+		var target_cell = this.gameMap.getCellXYFromXY(current_x+delta_x,current_y+delta_y);
+		//Ti.API.info('target index before check:'+this.gameMap.getIndexFromXY((target_cell.x),(target_cell.y)));
 		
-		if(was_blocked)
-			break;
-		
-		
-		//check y
-		for(j=0;j<this.sprite.width;j = j+step) {
-			if(this.gameMap.isBlocked(current_x+j, current_y_check)) {
-				was_blocked = true;
-				break;			
-			}
-		}
-		
-		if(was_blocked)
-			break;
-		
-		//check diagonal
-		if(this.gameMap.isBlocked(current_x_check, current_y_check)) {
+		//check target cell
+		if(this.gameMap.isBlocked(target_cell.x, target_cell.y)) {
 			was_blocked = true;
+			//Ti.API.info('blocked');
+			//Ti.API.info('current_x_check:'+current_x_check);
+			//Ti.API.info('current_y_check:'+current_y_check);
 			break;			
 		}	
 		
-		Ti.API.info('not blocked!');
+		//Ti.API.info('not blocked!');
 	}
 	
 	if(i) {
-		if(was_blocked)
-			this.moveStraight(this.sprite.x + cos_alfa * i,this.sprite.y + sin_alfa * i,speed);	
-		else
-			this.moveStraight(x,y,speed);
+		if(was_blocked) {
+			var current_cell = this.gameMap.getCellXYFromXY(current_x,current_y);
+			this.moveStraight(current_cell.x,current_cell.y,speed);	 
+		}
+			
+		else {
+			//check final cell in case it wasn't checked before'
+			if(!this.gameMap.isBlocked(x, y)) {
+				this.moveStraight(x,y,speed);
+			}
+			
+			else {
+				this.moveStraight(target_cell.x,target_cell.y,speed);
+			}
+		}
+			
 	}
 }
 

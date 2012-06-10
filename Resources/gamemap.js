@@ -83,10 +83,13 @@ GameMap.prototype.getIndexFromXY = function(x,y) {
 GameMap.prototype.isBlocked = function(x,y) {
 	
 	//true if out of borders
-	if(x>this.tilemap.width || x < 0 || y > this.tilemap.height || y < 0)
+	if(x>=this.tilemap.width || x < 0 || y >= this.tilemap.height || y < 0)
 		return true;
 	
 	var index = this.getIndexFromXY(x,y);
+	
+	//Ti.API.info('index:'+index+' blocked result is:'+(this.blockedIndexes.indexOf(index) != -1));
+	//Ti.API.info('x:'+x+' y:'+y);
 	
 	return this.blockedIndexes.indexOf(index) != -1;
 }
@@ -100,10 +103,23 @@ GameMap.prototype.updateBlockingElements = function() {
 	var tileCount =  this.blockedmap.tileCount;
 	
 	for(i=0;i<tileCount;i++) {
-		Ti.API.info(tiles[i]);
+		//Ti.API.info(tiles[i]);
 		if(tiles[i] == this.blocked_id) {
 			this.blockedIndexes.push(i);
 		}
 	}
+}
+
+/*
+ * Get cell corner x,y coordinates from x,y contained inside the cell
+ * @param int x
+ * @param int y
+ * @return Object
+ * 
+ */
+GameMap.prototype.getCellXYFromXY = function(x,y) {
+	cell = this.getCellFromXY(x,y);
+	//Ti.API.info('col:'+cell.col+' row:'+cell.row);
+	return this.getXYFromCell(cell.col,cell.row);
 }
 module.exports = GameMap;

@@ -58,8 +58,8 @@ map.updateBlockingElements();
 var player = new fariazz.GameSprite();
 player.gameMap = map;
 player.sprite = quicktigame2d.createSprite({image:GRAPHICS_DIR+'player.png'});
-player.sprite.x = 100;
-player.sprite.y = 100;
+player.sprite.x = 32;
+player.sprite.y = 32;
 
 
 // set z-order
@@ -99,11 +99,12 @@ gameView.addEventListener('touchstart', function(e) {
 	var cell = map.getCellFromXY(e.x*gameView.WINDOW_SCALE_FACTOR_X,e.y*gameView.WINDOW_SCALE_FACTOR_Y );
 	var coord = map.getXYFromCell(cell.col, cell.row);
 	
-	player.moveStraightCheck(coord.x,coord.y,speed);
-	
+	if(player.isMoving === false) {
+		player.moveStraightCheck(coord.x,coord.y,speed);
+	}
 	
 	var index = map.getIndexFromCell(cell.col,cell.row);
-	Ti.API.info(index);
+	//Ti.API.info(index);
 	
 	var tile = map.tilemap.getTile(index);
 	Ti.API.info(JSON.stringify(tile));
