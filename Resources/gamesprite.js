@@ -27,7 +27,7 @@ player.sprite.y = 100;
 }
 
 /*
- *	Move in a straigh line between to the target coordinates
+ *	Move in a straigh line between to the target map coordinates
  * @param int x position in the map
  * @param int y position in the map 
  * @param float speed in pixel/milisecond
@@ -35,6 +35,8 @@ player.sprite.y = 100;
  */
 GameSprite.prototype.moveStraight = function(x,y,speed,centered) {
 	var transform  = quicktigame2d.createTransform();
+	
+	Ti.API.info('moveStraight x:'+x+' y:'+y);
 	
 	if(centered !== undefined) {
 		x -= this.sprite.width/2;
@@ -48,17 +50,31 @@ GameSprite.prototype.moveStraight = function(x,y,speed,centered) {
 	
 	transform.duration = parseInt(distance/speed);
 	
-	Ti.API.info('duration: '+transform.duration);
+	//Ti.API.info('duration: '+transform.duration);
 	
 	transform.move(x,y);
 	this.isMoving = true;	
+	
+	Ti.API.info('sprite position prior movement. x:'+this.sprite.x+' y:'+this.sprite.y);
+	
 	this.sprite.transform(transform);
 	
-	sprite = this;
+	var sprite = this;
+	var map = this.gameMap;
+	
 	transform.addEventListener('complete', function(e) {
+		
+		Ti.API.info('sprite position after movement. x:'+sprite.sprite.x+' y:'+sprite.sprite.y);
+		
 		sprite.isMoving = false;
-	  //Ti.API.info(sprite.x);
-	  //Ti.API.info(sprite.y);
+		map.centerToMapXY(x,y);
+	  	
+	  	Ti.API.info('sprite position after camera movement. x:'+sprite.sprite.x+' y:'+sprite.sprite.y);
+	  	
+	  	var initial_cell = sprite.getMapXYPosition();
+	
+	Ti.API.info('map position after camera movement: '+JSON.stringify(initial_cell));
+	  	
 	});
 }
 
@@ -88,14 +104,18 @@ GameSprite.prototype.calculateDistance = function(x0,x1,y0,y1) {
  */
 GameSprite.prototype.moveStraightCheck = function(x,y,speed) {
 	//direction
-	var final_cell = this.gameMap.getCellXYFromXY(x,y);
-	var distance =  this.calculateDistance(this.sprite.x,final_cell.x,this.sprite.y,final_cell.y);
+	var initial_cell = this.getMapXYPosition();
+	
+	Ti.API.info('initial cell: '+JSON.stringify(initial_cell));
+	
+	var final_cell = this.gameMap.getCellXYFromMapXY(x,y);
+	var distance =  this.calculateDistance(initial_cell.x,final_cell.x,initial_cell.y,final_cell.y);
 	var delta = Math.min(distance,this.gameMap.tilemap.tileWidth/4);
 	
 	//Ti.API.info('delta:'+delta);
 	
-	var dx = x - this.sprite.x;
-	var dy = y - this.sprite.y;
+	var dx = x - initial_cell.x;
+	var dy = y - initial_cell.y;
 	var sin_alfa = dy / distance;
 	var cos_alfa = dx / distance;
 	
@@ -107,33 +127,30 @@ GameSprite.prototype.moveStraightCheck = function(x,y,speed) {
 	this.isMoving = true;
 	for(i=0;i<distance;i=i+delta) {
 		
-		var current_y = (this.sprite.y+this.gameMap.tilemap.tileHeight/2) + sin_alfa * i;
-		var current_x = (this.sprite.x+this.gameMap.tilemap.tileWidth/2) + cos_alfa * i;
+		var current_y = (initial_cell.y+this.gameMap.tilemap.tileHeight/2) + sin_alfa * i;
+		var current_x = (initial_cell.x+this.gameMap.tilemap.tileWidth/2) + cos_alfa * i;
 		
 		//Ti.API.info('current x:'+(current_x)+'current y:'+(current_y));
-		//Ti.API.info('current index:'+this.gameMap.getIndexFromXY(current_x,current_y));
+		//Ti.API.info('current index:'+this.gameMap.getIndexFromMapXY(current_x,current_y));
 				
 		//Ti.API.info('target raw x:'+(current_x+delta_x)+'target raw y:'+(current_y+delta_y));
-		//Ti.API.info('target raw index:'+this.gameMap.getIndexFromXY((current_x+delta_x),(current_y+delta_y)));
+		//Ti.API.info('target raw index:'+this.gameMap.getIndexFromMapXY((current_x+delta_x),(current_y+delta_y)));
 		
-		var target_cell = this.gameMap.getCellXYFromXY(current_x+delta_x,current_y+delta_y);
-		//Ti.API.info('target index before check:'+this.gameMap.getIndexFromXY((target_cell.x),(target_cell.y)));
+		var target_cell = this.gameMap.getCellXYFromMapXY(current_x+delta_x,current_y+delta_y);
 		
 		//check target cell
 		if(this.gameMap.isBlocked(target_cell.x, target_cell.y)) {
 			was_blocked = true;
-			//Ti.API.info('blocked');
-			//Ti.API.info('current_x_check:'+current_x_check);
-			//Ti.API.info('current_y_check:'+current_y_check);
+			Ti.API.info('blocked');
 			break;			
 		}	
 		
-		//Ti.API.info('not blocked!');
+		Ti.API.info('not blocked!');
 	}
 	
 	if(i) {
 		if(was_blocked) {
-			var current_cell = this.gameMap.getCellXYFromXY(current_x,current_y);
+			var current_cell = this.gameMap.getCellXYFromMapXY(current_x,current_y);
 			this.moveStraight(current_cell.x,current_cell.y,speed);	 
 		}
 			
@@ -150,5 +167,16 @@ GameSprite.prototype.moveStraightCheck = function(x,y,speed) {
 			
 	}
 }
+
+/*
+ * get the position x, y in map coordinates
+ * 
+ */
+GameSprite.prototype.getMapXYPosition = function() {
+	return {
+		x:this.sprite.x,
+		y:this.sprite.y
+		}
+};
 
 module.exports = GameSprite;

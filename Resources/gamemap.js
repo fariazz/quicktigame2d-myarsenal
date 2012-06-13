@@ -19,15 +19,25 @@ GameMap = function() {
 	
 	//indexes of all blocking elements
 	this.blockedIndexes = new Array();
+	
+	this.camera_dx = 0;
+	this.camera_dy = 0;
+	
+	//game view
+	this.gameView;
 }
 
 /*
- * Get cell row, col from x, y coordinates
+ * Get cell row, col from x, y screen coordinates
  * @param int x position in the map
  * @param int y position in the map 
  * @return Object
  */
-GameMap.prototype.getCellFromXY = function(x,y) {
+GameMap.prototype.getCellFromScreenXY = function(x,y) {
+	
+	x = x+this.camera_dx;
+	y = y+this.camera_dy;
+	
 	var col = parseInt((x - x%this.tilemap.tileWidth)/this.tilemap.tileWidth);
 	var row = parseInt((y - y%this.tilemap.tileHeight)/this.tilemap.tileHeight);
 	
@@ -35,13 +45,27 @@ GameMap.prototype.getCellFromXY = function(x,y) {
 }
 
 /*
- * Get x, y coordinates of a given cell
+ * Get cell row, col from x, y map coordinates
+ * @param int x position in the map
+ * @param int y position in the map 
+ * @return Object
+ */
+GameMap.prototype.getCellFromMapXY = function(x,y) {
+	
+	var col = parseInt((x - x%this.tilemap.tileWidth)/this.tilemap.tileWidth);
+	var row = parseInt((y - y%this.tilemap.tileHeight)/this.tilemap.tileHeight);
+	
+	return {'col': col, 'row': row};
+}
+
+/*
+ * Get x, y map coordinates of a given cell
  * @param int col column, starting from 0
  * @param int row row, starting from 0
  * @param boolean centered, if true return the center of the cell, otherwise return the upper left corner
  * @return Object
  */
-GameMap.prototype.getXYFromCell = function(col,row, centered) {
+GameMap.prototype.getMapXYFromCell = function(col,row, centered) {
 	var x = col* this.tilemap.tileWidth;
 	var y = row*this.tilemap.tileHeight;
 	
@@ -64,13 +88,13 @@ GameMap.prototype.getIndexFromCell = function(col, row) {
 }
 
 /*
- * Get tile index from x, y coordinates
+ * Get tile index from x, y map coordinates
  * @param int x position in the map
  * @param int y position in the map 
  * @return int index
  */
-GameMap.prototype.getIndexFromXY = function(x,y) {
-	var cell = this.getCellFromXY(x,y);
+GameMap.prototype.getIndexFromMapXY = function(x,y) {
+	var cell = this.getCellFromMapXY(x,y);
 	return this.getIndexFromCell(cell.col,cell.row);
 }
 
@@ -86,10 +110,10 @@ GameMap.prototype.isBlocked = function(x,y) {
 	if(x>=this.tilemap.width || x < 0 || y >= this.tilemap.height || y < 0)
 		return true;
 	
-	var index = this.getIndexFromXY(x,y);
+	var index = this.getIndexFromMapXY(x,y);
 	
-	//Ti.API.info('index:'+index+' blocked result is:'+(this.blockedIndexes.indexOf(index) != -1));
-	//Ti.API.info('x:'+x+' y:'+y);
+	Ti.API.info('index:'+index+' blocked result is:'+(this.blockedIndexes.indexOf(index) != -1));
+	Ti.API.info('x:'+x+' y:'+y);
 	
 	return this.blockedIndexes.indexOf(index) != -1;
 }
@@ -111,15 +135,41 @@ GameMap.prototype.updateBlockingElements = function() {
 }
 
 /*
- * Get cell corner x,y coordinates from x,y contained inside the cell
+ * Get cell corner x,y coordinates from map x,y contained inside the cell
  * @param int x
  * @param int y
  * @return Object
  * 
  */
-GameMap.prototype.getCellXYFromXY = function(x,y) {
-	cell = this.getCellFromXY(x,y);
+GameMap.prototype.getCellXYFromMapXY = function(x,y) {
+	cell = this.getCellFromMapXY(x,y);
 	//Ti.API.info('col:'+cell.col+' row:'+cell.row);
-	return this.getXYFromCell(cell.col,cell.row);
+	return this.getMapXYFromCell(cell.col,cell.row);
 }
+
+/*
+ * Center map the given map coordinates
+ * @param float x map coordinate
+ * @param float y map coordinate
+ */
+GameMap.prototype.centerToMapXY = function(x,y) {
+	var transform_camera = quicktigame2d.createTransform();
+
+	transform_camera.duration = 1000;
+        
+	transform_camera.lookAt_eyeX = x;
+	transform_camera.lookAt_eyeY = y;
+
+	transform_camera.lookAt_centerX = x;
+	transform_camera.lookAt_centerY = y;
+
+	this.camera_dx = x-this.gameView.screen.width/2;
+	this.camera_dy = y-this.gameView.screen.height/2;
+
+	Ti.API.info('camera_dx:'+this.camera_dx+' camera_dy:'+this.camera_dy);
+
+	this.gameView.moveCamera(transform_camera);
+}
+
+
 module.exports = GameMap;

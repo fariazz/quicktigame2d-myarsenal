@@ -64,6 +64,8 @@ player.sprite.y = 32;
 
 // set z-order
 map.tilemap.z  = 0;
+map.player = player;
+map.gameView = gameView;
 
 scene.add(map.tilemap);
 scene.add(player.sprite);
@@ -88,6 +90,7 @@ gameView.addEventListener('onload', function(e) {
     // Start the game
     gameView.start();
     
+    //map.centerToPlayer();
 });
 
 gameView.addEventListener('touchstart', function(e) {
@@ -96,19 +99,25 @@ gameView.addEventListener('touchstart', function(e) {
 	var speed = 0.1;
 	
 	//get cell that was click and move to the top left corner
-	var cell = map.getCellFromXY(e.x*gameView.WINDOW_SCALE_FACTOR_X,e.y*gameView.WINDOW_SCALE_FACTOR_Y );
-	var coord = map.getXYFromCell(cell.col, cell.row);
+	var x = e.x*gameView.WINDOW_SCALE_FACTOR_X;
+	var y = e.y*gameView.WINDOW_SCALE_FACTOR_Y;
 	
-	if(player.isMoving === false) {
+	Ti.API.info('touched x:'+x+' touched y:'+y);
+	
+	var cell = map.getCellFromScreenXY(x,y);
+	var coord = map.getMapXYFromCell(cell.col, cell.row);
+	
+	//if(player.isMoving === false) {
 		player.moveStraightCheck(coord.x,coord.y,speed);
-	}
+	//}
 	
 	var index = map.getIndexFromCell(cell.col,cell.row);
-	//Ti.API.info(index);
+	//Ti.API.info('index:'+index);
 	
 	var tile = map.tilemap.getTile(index);
 	Ti.API.info(JSON.stringify(tile));
-
+	
+	//map.centerToPlayer();
 	
 });
 
