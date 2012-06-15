@@ -153,22 +153,63 @@ GameMap.prototype.getCellXYFromMapXY = function(x,y) {
  * @param float y map coordinate
  */
 GameMap.prototype.centerToMapXY = function(x,y) {
+	
 	var transform_camera = quicktigame2d.createTransform();
 
-	transform_camera.duration = 1000;
-        
-	transform_camera.lookAt_eyeX = x;
-	transform_camera.lookAt_eyeY = y;
-
-	transform_camera.lookAt_centerX = x;
-	transform_camera.lookAt_centerY = y;
-
-	this.camera_dx = x-this.gameView.screen.width/2;
-	this.camera_dy = y-this.gameView.screen.height/2;
+	transform_camera.duration = 200;
+    
+    //center unless it's in the borders
+    trigger = false;
+    if(x>this.gameView.screen.width/2 && x < this.tilemap.width-this.gameView.screen.width/2) {
+    	transform_camera.lookAt_eyeX = x;
+    	transform_camera.lookAt_centerX = x;
+    	this.camera_dx = x-this.gameView.screen.width/2;
+    	trigger = true;
+    }
+    
+    else if(x<this.gameView.screen.width/2) {
+		transform_camera.lookAt_eyeX = this.gameView.screen.width/2;
+    	transform_camera.lookAt_centerX = this.gameView.screen.width/2;
+    	this.camera_dx = 0;
+    	trigger = true;
+    }
+    
+    else if(x > this.tilemap.width-this.gameView.screen.width/2) {
+		transform_camera.lookAt_eyeX = this.tilemap.width-this.gameView.screen.width/2;
+    	transform_camera.lookAt_centerX = this.tilemap.width-this.gameView.screen.width/2;
+    	this.camera_dx = this.tilemap.width-this.gameView.screen.width;
+    	trigger = true;    	
+    }
+    if(y>this.gameView.screen.height/2 && y < this.tilemap.height-this.gameView.screen.height/2) {
+    	transform_camera.lookAt_eyeY = y;
+    	transform_camera.lookAt_centerY = y;
+    	this.camera_dy = y-this.gameView.screen.height/2;
+    	trigger = true;
+    }
+    
+    else if(y<this.gameView.screen.height/2) {
+		transform_camera.lookAt_eyeY = this.gameView.screen.height/2;
+    	transform_camera.lookAt_centerY = this.gameView.screen.height/2;
+    	this.camera_dy = 0;
+    	trigger = true;
+    }
+    
+    else if(y > this.tilemap.height-this.gameView.screen.height/2) {
+		transform_camera.lookAt_eyeY = this.tilemap.height-this.gameView.screen.height/2;
+    	transform_camera.lookAt_centerY = this.tilemap.height-this.gameView.screen.height/2;
+    	this.camera_dy = this.tilemap.height-this.gameView.screen.height;
+    	trigger = true;    	
+    }
+    
+    
+    
+    
 
 	Ti.API.info('camera_dx:'+this.camera_dx+' camera_dy:'+this.camera_dy);
-
-	this.gameView.moveCamera(transform_camera);
+	if(trigger) {
+		this.gameView.moveCamera(transform_camera);
+	}
+	
 }
 
 

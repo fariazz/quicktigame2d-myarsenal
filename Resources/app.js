@@ -26,7 +26,7 @@ var scene = quicktigame2d.createScene();
 
 //load map files
 var GRAPHICS_DIR = 'graphics/';
-var mapfile = Ti.Filesystem.getFile(Titanium.Filesystem.resourcesDirectory, GRAPHICS_DIR + 'map3.json');
+var mapfile = Ti.Filesystem.getFile(Titanium.Filesystem.resourcesDirectory, GRAPHICS_DIR + 'biggermap.json');
 var mapjson = JSON.parse(mapfile.read().toString());
 
 var mapinfo = {
@@ -51,7 +51,7 @@ map.blockedmap.height = map.blockedmap.tileHeight * mapjson.layers[0].height;
 map.blockedmap.firstgid = mapjson.tilesets[0].firstgid; // tilemap id is started from 'firstgid'
 map.blockedmap.tiles = mapjson.layers[1].data;
 
-map.blocked_id = 113;
+map.blocked_id = 58;
 map.updateBlockingElements();
 
 //create player
